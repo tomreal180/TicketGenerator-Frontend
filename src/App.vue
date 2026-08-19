@@ -14,7 +14,7 @@ const downloadTicket = async () => {
   pdfUrl.value = null
   
   try {
-    const response = await fetch('http://localhost:5000/api/generate-ticket', {
+    const response = await fetch('https://ticketgenerator-backend.onrender.com/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
