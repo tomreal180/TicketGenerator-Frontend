@@ -184,9 +184,7 @@ const triggerDownload = () => {
       </main>
 
       <!-- Sponsors Section -->
-      <div class="mt-24 w-full overflow-hidden relative">
-        <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background-base to-transparent z-10 pointer-events-none"></div>
-        <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background-base to-transparent z-10 pointer-events-none"></div>
+      <div class="mt-24 w-full overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
         <p class="text-center text-xs font-medium tracking-widest text-[#BBA8D6] uppercase mb-8">Được đồng hành cùng</p>
         <div class="flex w-max animate-marquee opacity-50 hover:opacity-100 transition-opacity duration-500">
           <div class="flex gap-24 px-12 items-center">
