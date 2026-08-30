@@ -7,14 +7,15 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 const pdfUrl = ref<string | null>(null)
 const downloadedFilename = ref('ticket.pdf')
+const API_URL = 'https://ticketgenerator-backend.onrender.com/api/generate-ticket'
+// const API_URL = 'http://127.0.0.1:5000/api/generate-ticket'
 
 const downloadTicket = async () => {
   isLoading.value = true
   errorMessage.value = ''
-  pdfUrl.value = null
-  
+  pdfUrl.value = null  
   try {
-    const response = await fetch('https://ticketgenerator-backend.onrender.com/api/generate-ticket', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -78,16 +79,22 @@ const triggerDownload = () => {
       
       <!-- Header -->
       <header class="mb-16 md:mb-24 text-center flex flex-col items-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/50 bg-accent/20 mb-8 backdrop-blur-md">
-          <span class="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse shadow-[0_0_8px_#00E5FF]"></span>
-          <span class="text-xs font-mono text-[#F4F0FA] tracking-widest uppercase">SiviCamp 2026</span>
+        <!-- Organizer Logos -->
+        <div class="mb-10 flex justify-center items-center gap-6 md:gap-10">
+          <img src="./assets/vgi.svg" alt="VGI Logo" class="h-10 md:h-12 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+          <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-14 md:h-16 w-auto opacity-100 drop-shadow-[0_0_12px_rgba(255,255,255,0.15)] hover:scale-105 transition-all" />
+          <img src="./assets/vsaf.svg" alt="VSAF Logo" class="h-10 md:h-12 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+        </div>
+
+        <div class="mb-6 flex justify-center items-center">
+          <img src="./assets/LOGO.svg" alt="SiviCamp 2026 Logo" class="h-36 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
         </div>
         
         <h1 class="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-tight mb-6 bg-gradient-to-b from-white via-[#E2D9F3] to-[#8A78A8] bg-clip-text text-transparent">
-          Retrieve your access.
+          Nhận vé điện tử của bạn.
         </h1>
         <p class="text-[#BBA8D6] text-lg md:text-xl max-w-2xl font-light">
-          Enter your registered email and date of birth to securely generate and download your personalized event pass.
+          Nhập địa chỉ email và ngày sinh bạn đã đăng ký để tải về vé sự kiện của riêng bạn.
         </p>
       </header>
 
@@ -98,23 +105,23 @@ const triggerDownload = () => {
           <!-- Inner Highlight -->
           <div class="absolute inset-0 rounded-2xl shadow-inner-highlight pointer-events-none"></div>
           
-          <h2 class="text-2xl font-semibold tracking-tight mb-8 text-white">Authentication</h2>
+          <h2 class="text-2xl font-semibold tracking-tight mb-8 text-white">Xác thực thông tin</h2>
           
           <form @submit.prevent="downloadTicket" class="space-y-6 relative z-10">
             <div class="space-y-2">
-              <label for="email" class="block text-sm font-medium text-[#BBA8D6]">Email Address</label>
+              <label for="email" class="block text-sm font-medium text-[#BBA8D6]">Địa chỉ Email</label>
               <input 
                 type="email" 
                 id="email" 
                 v-model="email" 
                 required
                 class="block w-full bg-[#0B0410]/80 border border-white/10 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:border-[#482EC2] focus:shadow-input-focus transition-all duration-200 placeholder:text-white/30"
-                placeholder="developer@example.com"
+                placeholder="nguoidung@example.com"
               />
             </div>
 
             <div class="space-y-2">
-              <label for="dob" class="block text-sm font-medium text-[#BBA8D6]">Date of Birth</label>
+              <label for="dob" class="block text-sm font-medium text-[#BBA8D6]">Ngày sinh</label>
               <input 
                 type="text" 
                 id="dob" 
@@ -134,9 +141,9 @@ const triggerDownload = () => {
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
               <span v-if="isLoading" class="flex items-center justify-center gap-2">
                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Authenticating...
+                Đang xác thực...
               </span>
-              <span v-else>Generate Pass</span>
+              <span v-else>Tạo vé</span>
             </button>
           </form>
 
@@ -153,7 +160,7 @@ const triggerDownload = () => {
           <div v-if="!pdfUrl" class="flex-grow rounded-2xl border border-white/[0.04] bg-[#1D0E36]/20 flex flex-col items-center justify-center p-12 text-center relative overflow-hidden backdrop-blur-sm">
             <svg class="w-12 h-12 text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             <p class="text-[#BBA8D6] font-medium text-sm">
-              Your pass will appear here securely
+              Vé của bạn sẽ hiển thị tại đây
             </p>
           </div>
 
@@ -169,22 +176,49 @@ const triggerDownload = () => {
               class="self-start bg-white/10 text-white py-2 px-4 rounded-lg font-medium border-none shadow-inner-highlight hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-200 active:scale-[0.98] flex items-center gap-2 text-sm"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-              Download PDF
+              Tải PDF
             </button>
           </div>
         </div>
 
       </main>
 
+      <!-- Sponsors Section -->
+      <div class="mt-24 w-full overflow-hidden relative">
+        <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background-base to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background-base to-transparent z-10 pointer-events-none"></div>
+        <p class="text-center text-xs font-medium tracking-widest text-[#BBA8D6] uppercase mb-8">Được đồng hành cùng</p>
+        <div class="flex w-max animate-marquee opacity-50 hover:opacity-100 transition-opacity duration-500">
+          <div class="flex gap-24 px-12 items-center">
+            <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/GDG.svg" alt="GDG Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/n8n.svg" alt="n8n Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+          </div>
+          <div class="flex gap-24 px-12 items-center">
+            <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/GDG.svg" alt="GDG Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/n8n.svg" alt="n8n Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+          </div>
+        </div>
+      </div>
+
       <!-- Footer -->
-      <footer class="mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+      <footer class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-center items-center gap-4">
         <p class="text-[#BBA8D6] text-xs tracking-wider">
           <span class="text-white font-medium">SiviCamp</span> © 2026
         </p>
-        <div class="flex items-center gap-2 text-xs text-[#BBA8D6]">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_4px_#00E5FF]"></span>
-          Systems Operational
-        </div>
       </footer>
     </div>
   </div>
@@ -193,5 +227,14 @@ const triggerDownload = () => {
 <style>
 @keyframes shimmer {
   100% { transform: translateX(100%); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
 }
 </style>
