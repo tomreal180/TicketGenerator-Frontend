@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const email = ref('')
 const dob = ref('')
@@ -8,7 +8,43 @@ const errorMessage = ref('')
 const pdfUrl = ref<string | null>(null)
 const downloadedFilename = ref('ticket.pdf')
 const API_URL = 'https://ticketgenerator-backend.onrender.com/api/generate-ticket'
+
+const isEmailValid = computed(() => {
+  if (!email.value) return null
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
+})
+
+const isDobValid = computed(() => {
+  if (!dob.value) return null
+  // DD/MM/YYYY format validation
+  return /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/.test(dob.value)
+})
+
+const supportsPDFViewer = computed(() => {
+  if (typeof navigator !== 'undefined' && 'pdfViewerEnabled' in navigator) {
+    return navigator.pdfViewerEnabled
+  }
+  // Dự phòng cho các trình duyệt cũ: giả định màn hình to là Desktop (có hỗ trợ), màn nhỏ là Mobile (không hỗ trợ)
+  return window.innerWidth >= 768
+})
+
+const isFormValid = computed(() => {
+  return isEmailValid.value === true && isDobValid.value === true
+})
+
 // const API_URL = 'http://127.0.0.1:5000/api/generate-ticket'
+
+const formatDob = (e: Event) => {
+  const input = e.target as HTMLInputElement
+  let val = input.value.replace(/\D/g, '')
+  
+  let formatted = ''
+  if (val.length > 0) formatted = val.substring(0, 2)
+  if (val.length > 2) formatted += '/' + val.substring(2, 4)
+  if (val.length > 4) formatted += '/' + val.substring(4, 8)
+  
+  dob.value = formatted
+}
 
 const downloadTicket = async () => {
   isLoading.value = true
@@ -42,6 +78,12 @@ const downloadTicket = async () => {
 
     const blob = await response.blob()
     pdfUrl.value = window.URL.createObjectURL(blob)
+    
+    // Tự động kích hoạt tải về nếu trình duyệt không hỗ trợ xem trước PDF
+    if (!supportsPDFViewer.value) {
+      // Delay một chút để UI kịp cập nhật thông báo thành công
+      setTimeout(() => triggerDownload(), 300)
+    }
     
   } catch (error: any) {
     errorMessage.value = error.message
@@ -115,7 +157,12 @@ const triggerDownload = () => {
                 id="email" 
                 v-model="email" 
                 required
-                class="block w-full bg-[#0B0410]/80 border border-white/10 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:border-[#482EC2] focus:shadow-input-focus transition-all duration-200 placeholder:text-white/30"
+                :class="[
+                  'block w-full bg-[#0B0410]/80 border rounded-lg px-4 py-3 text-base text-white focus:outline-none transition-all duration-200 placeholder:text-white/30',
+                  isEmailValid === true ? 'border-green-500 focus:border-green-500 focus:shadow-[0_0_0_1px_#22c55e,0_0_0_4px_rgba(34,197,94,0.2)]' : 
+                  isEmailValid === false ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_0_1px_#ef4444,0_0_0_4px_rgba(239,68,68,0.2)] text-red-300' : 
+                  'border-white/10 focus:border-[#482EC2] focus:shadow-input-focus'
+                ]"
                 placeholder="nguoidung@example.com"
               />
             </div>
@@ -126,16 +173,26 @@ const triggerDownload = () => {
                 type="text" 
                 id="dob" 
                 v-model="dob" 
+                @input="formatDob"
+                maxlength="10"
                 required
-                class="block w-full bg-[#0B0410]/80 border border-white/10 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:border-[#482EC2] focus:shadow-input-focus transition-all duration-200 placeholder:text-white/30"
+                :class="[
+                  'block w-full bg-[#0B0410]/80 border rounded-lg px-4 py-3 text-base text-white focus:outline-none transition-all duration-200 placeholder:text-white/30',
+                  isDobValid === true ? 'border-green-500 focus:border-green-500 focus:shadow-[0_0_0_1px_#22c55e,0_0_0_4px_rgba(34,197,94,0.2)]' : 
+                  isDobValid === false ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_0_1px_#ef4444,0_0_0_4px_rgba(239,68,68,0.2)] text-red-300' : 
+                  'border-white/10 focus:border-[#482EC2] focus:shadow-input-focus'
+                ]"
                 placeholder="DD/MM/YYYY"
               />
             </div>
 
             <button 
               type="submit" 
-              :disabled="isLoading"
-              class="w-full bg-[#2E1B7F] text-white py-3 px-4 rounded-lg font-medium shadow-button-glow hover:bg-[#482EC2] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 mt-4 relative overflow-hidden"
+              :disabled="isLoading || !isFormValid"
+              :class="[
+                'w-full text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 mt-4 relative overflow-hidden group',
+                (isLoading || !isFormValid) ? 'bg-[#2E1B7F]/50 opacity-50 cursor-not-allowed' : 'bg-[#2E1B7F] shadow-button-glow hover:bg-[#482EC2] active:scale-[0.98]'
+              ]"
             >
               <!-- Shine Effect -->
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
@@ -167,8 +224,18 @@ const triggerDownload = () => {
           <div v-else class="flex-grow flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="flex-grow rounded-2xl border border-white/[0.08] bg-[#0B0410] overflow-hidden p-1 shadow-card transition-all hover:shadow-card-hover hover:border-white/[0.15] duration-300 relative group">
                 <div class="absolute inset-0 shadow-inner-highlight pointer-events-none rounded-2xl"></div>
-                <!-- PDF Viewer -->
-                <iframe :src="pdfUrl" class="w-full h-[600px] border-0 rounded-xl bg-white" title="Ticket Preview"></iframe>
+                
+                <!-- Desktop / Supported PDF Viewer -->
+                <iframe v-if="supportsPDFViewer" :src="pdfUrl" class="w-full h-[600px] border-0 rounded-xl bg-white" title="Ticket Preview"></iframe>
+                
+                <!-- Unsupported Browser Success Fallback -->
+                <div v-else class="w-full h-[300px] rounded-xl bg-white/5 flex flex-col items-center justify-center p-6 text-center">
+                  <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <h3 class="text-white text-lg font-semibold mb-2">Vé đã tạo thành công!</h3>
+                  <p class="text-[#BBA8D6] text-sm">Hệ thống đang tự động tải vé về thiết bị của bạn. Bạn cũng có thể bấm nút Tải PDF bên dưới nếu quá trình tự động gặp lỗi.</p>
+                </div>
             </div>
             
             <button 
