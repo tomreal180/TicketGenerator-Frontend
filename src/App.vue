@@ -140,10 +140,10 @@ const triggerDownload = () => {
         </p>
       </header>
 
-      <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start flex-grow">
+      <main :class="['items-start flex-grow w-full transition-all duration-700', pdfUrl ? 'grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12' : 'flex justify-center']">
         
         <!-- Form Section (Card) -->
-        <div class="lg:col-span-5 w-full bg-[#1D0E36]/40 rounded-2xl border border-white/10 p-6 md:p-8 shadow-card backdrop-blur-xl relative overflow-hidden group">
+        <div :class="['w-full bg-[#1D0E36]/40 rounded-2xl border border-white/10 p-6 md:p-8 shadow-card backdrop-blur-xl relative overflow-hidden group transition-all duration-700', pdfUrl ? 'lg:col-span-5' : 'max-w-lg']">
           <!-- Inner Highlight -->
           <div class="absolute inset-0 rounded-2xl shadow-inner-highlight pointer-events-none"></div>
           
@@ -212,16 +212,9 @@ const triggerDownload = () => {
         </div>
 
         <!-- Ticket Preview Section -->
-        <div class="lg:col-span-7 w-full h-full min-h-[500px] flex flex-col">
+        <div v-if="pdfUrl" class="lg:col-span-7 w-full h-full min-h-[500px] flex flex-col animate-in fade-in slide-in-from-right-4 duration-700">
           
-          <div v-if="!pdfUrl" class="flex-grow rounded-2xl border border-white/[0.04] bg-[#1D0E36]/20 flex flex-col items-center justify-center p-12 text-center relative overflow-hidden backdrop-blur-sm">
-            <svg class="w-12 h-12 text-white/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            <p class="text-[#BBA8D6] font-medium text-sm">
-              Vé của bạn sẽ hiển thị tại đây
-            </p>
-          </div>
-
-          <div v-else class="flex-grow flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div class="flex-grow flex flex-col space-y-6">
             <div class="flex-grow rounded-2xl border border-white/[0.08] bg-[#0B0410] overflow-hidden p-1 shadow-card transition-all hover:shadow-card-hover hover:border-white/[0.15] duration-300 relative group">
                 <div class="absolute inset-0 shadow-inner-highlight pointer-events-none rounded-2xl"></div>
                 
