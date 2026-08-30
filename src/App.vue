@@ -254,7 +254,7 @@ const triggerDownload = () => {
             <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
             <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
             <img src="./assets/GDG.svg" alt="GDG Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <!-- <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" /> -->
             <img src="./assets/n8n.svg" alt="n8n Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
             <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
           </div>
@@ -265,7 +265,7 @@ const triggerDownload = () => {
             <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
             <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
             <img src="./assets/GDG.svg" alt="GDG Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+            <!-- <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" /> -->
             <img src="./assets/n8n.svg" alt="n8n Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
             <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
           </div>
