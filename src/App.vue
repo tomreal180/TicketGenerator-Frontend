@@ -212,23 +212,23 @@ const triggerDownload = () => {
         </div>
 
         <!-- Ticket Preview Section -->
-        <div v-if="pdfUrl" class="lg:col-span-7 w-full h-full min-h-[500px] flex flex-col animate-in fade-in slide-in-from-right-4 duration-700">
+        <div v-if="pdfUrl" class="lg:col-span-7 w-full h-full flex flex-col justify-center animate-in fade-in slide-in-from-right-4 duration-700">
           
-          <div class="flex-grow flex flex-col space-y-6">
-            <div class="flex-grow rounded-2xl border border-white/[0.08] bg-[#0B0410] overflow-hidden p-1 shadow-card transition-all hover:shadow-card-hover hover:border-white/[0.15] duration-300 relative group">
+          <div class="flex flex-col space-y-6 w-full">
+            
+            <!-- Desktop / Supported PDF Viewer -->
+            <div v-if="supportsPDFViewer" class="w-full rounded-2xl border border-white/[0.08] bg-[#0B0410] overflow-hidden p-1 shadow-card transition-all hover:shadow-card-hover hover:border-white/[0.15] duration-300 relative group">
                 <div class="absolute inset-0 shadow-inner-highlight pointer-events-none rounded-2xl"></div>
+                <iframe :src="pdfUrl" class="w-full h-[600px] border-0 rounded-xl bg-white" title="Ticket Preview"></iframe>
+            </div>
                 
-                <!-- Desktop / Supported PDF Viewer -->
-                <iframe v-if="supportsPDFViewer" :src="pdfUrl" class="w-full h-[600px] border-0 rounded-xl bg-white" title="Ticket Preview"></iframe>
-                
-                <!-- Unsupported Browser Success Fallback -->
-                <div v-else class="w-full h-[300px] rounded-xl bg-white/5 flex flex-col items-center justify-center p-6 text-center">
-                  <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                  </div>
-                  <h3 class="text-white text-lg font-semibold mb-2">Vé đã tạo thành công!</h3>
-                  <p class="text-[#BBA8D6] text-sm">Hệ thống đang tự động tải vé về thiết bị của bạn. Bạn cũng có thể bấm nút Tải PDF bên dưới nếu quá trình tự động gặp lỗi.</p>
-                </div>
+            <!-- Unsupported Browser Success Fallback -->
+            <div v-else class="w-full bg-[#1D0E36]/40 rounded-2xl border border-white/10 p-8 shadow-card backdrop-blur-xl flex flex-col items-center justify-center text-center">
+              <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+              <h3 class="text-white text-lg font-semibold mb-2">Vé đã tạo thành công!</h3>
+              <p class="text-[#BBA8D6] text-sm">Hệ thống đang tự động tải vé về thiết bị của bạn. Bạn cũng có thể bấm nút Tải PDF bên dưới nếu quá trình tự động gặp lỗi.</p>
             </div>
             
             <button 
