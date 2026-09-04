@@ -180,10 +180,10 @@ const triggerDownload = () => {
         </div>
 
         <h1 class="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-tight mb-4 bg-gradient-to-b from-white via-[#E2D9F3] to-[#8A78A8] bg-clip-text text-transparent">
-          Nhận vé điện tử của bạn
+          Nhận vé điện tử SiviCamp 2026
         </h1>
         <p class="text-[#BBA8D6] text-base md:text-lg max-w-2xl font-light">
-          Nhập địa chỉ email và ngày sinh bạn đã đăng ký để tải về vé.
+          Nhập địa chỉ email và ngày sinh bạn đã đăng ký để nhận vé.
         </p>
       </header>
 
