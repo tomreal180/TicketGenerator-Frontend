@@ -46,9 +46,25 @@ const formatDob = (e: Event) => {
   dob.value = formatted
 }
 
+const lastEmail = ref('')
+const lastDob = ref('')
+const successMessage = ref('')
+
+const isTicketCached = computed(() => {
+  return email.value === lastEmail.value && dob.value === lastDob.value && !!pdfUrl.value
+})
+
 const downloadTicket = async () => {
+  if (isTicketCached.value) {
+    successMessage.value = 'Vé của bạn đã được tải thành công, vui lòng kiểm tra phần Download.'
+    triggerDownload()
+    setTimeout(() => { successMessage.value = '' }, 3500)
+    return
+  }
+
   isLoading.value = true
   errorMessage.value = ''
+  successMessage.value = ''
   pdfUrl.value = null  
   try {
     const response = await fetch(API_URL, {
@@ -78,6 +94,10 @@ const downloadTicket = async () => {
 
     const blob = await response.blob()
     pdfUrl.value = window.URL.createObjectURL(blob)
+    
+    // Lưu lại cache session
+    lastEmail.value = email.value
+    lastDob.value = dob.value
     
     // Tự động kích hoạt tải về nếu trình duyệt không hỗ trợ xem trước PDF
     if (!supportsPDFViewer.value) {
@@ -117,26 +137,53 @@ const triggerDownload = () => {
     <div class="fixed top-[20%] left-[-10%] w-[600px] h-[600px] bg-[#FF3366]/10 rounded-full blur-[100px] animate-float-delayed z-0 pointer-events-none"></div>
     <div class="fixed top-[40%] right-[-10%] w-[500px] h-[700px] bg-[#00E5FF]/10 rounded-full blur-[120px] animate-float z-0 pointer-events-none"></div>
 
-    <div class="relative z-10 flex-grow flex flex-col max-w-6xl mx-auto w-full px-6 md:px-12 py-16 md:py-32">
+    <div class="relative z-10 flex-grow flex flex-col max-w-6xl mx-auto w-full px-6 md:px-12 py-8 md:py-12">
       
       <!-- Header -->
-      <header class="mb-16 md:mb-24 text-center flex flex-col items-center">
+      <header class="mb-8 md:mb-12 text-center flex flex-col items-center">
         <!-- Organizer Logos -->
-        <div class="mb-10 flex justify-center items-center gap-6 md:gap-10">
-          <img src="./assets/vgi.svg" alt="VGI Logo" class="h-10 md:h-12 w-auto opacity-80 hover:opacity-100 transition-opacity" />
-          <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-14 md:h-16 w-auto opacity-100 drop-shadow-[0_0_12px_rgba(255,255,255,0.15)] hover:scale-105 transition-all" />
-          <img src="./assets/vsaf.svg" alt="VSAF Logo" class="h-10 md:h-12 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+        <div class="flex justify-center items-center">
+          <img src="./assets/vgi.svg" alt="VGI Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+          <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-20 md:h-24 w-auto opacity-100 drop-shadow-[0_0_12px_rgba(255,255,255,0.15)] hover:scale-105 transition-all" />
+          <img src="./assets/vsaf.svg" alt="VSAF Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
         </div>
 
-        <div class="mb-6 flex justify-center items-center">
-          <img src="./assets/LOGO.svg" alt="SiviCamp 2026 Logo" class="h-36 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+        <div class="mb-3 flex justify-center items-center">
+          <img src="./assets/LOGO.svg" alt="SiviCamp 2026 Logo" class="h-28 md:h-32 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
         </div>
         
-        <h1 class="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-tight mb-6 bg-gradient-to-b from-white via-[#E2D9F3] to-[#8A78A8] bg-clip-text text-transparent">
-          Nhận vé điện tử của bạn.
+        <!-- Sponsors Section -->
+        <div class="mb-16 w-full max-w-4xl overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
+          <p class="text-center text-xs font-medium tracking-widest text-[#BBA8D6]/60 uppercase mb-4">Được đồng hành cùng</p>
+          <div class="flex w-max animate-marquee opacity-60 hover:opacity-100 transition-opacity duration-500">
+            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center">
+              <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/GDG.svg" alt="GDG Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/n8n.svg" alt="n8n Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+            </div>
+            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center" aria-hidden="true">
+              <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/GDG.svg" alt="GDG Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/n8n.svg" alt="n8n Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+            </div>
+          </div>
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-tight mb-4 bg-gradient-to-b from-white via-[#E2D9F3] to-[#8A78A8] bg-clip-text text-transparent">
+          Nhận vé điện tử của bạn
         </h1>
-        <p class="text-[#BBA8D6] text-lg md:text-xl max-w-2xl font-light">
-          Nhập địa chỉ email và ngày sinh bạn đã đăng ký để tải về vé sự kiện của riêng bạn.
+        <p class="text-[#BBA8D6] text-base md:text-lg max-w-2xl font-light">
+          Nhập địa chỉ email và ngày sinh bạn đã đăng ký để tải về vé.
         </p>
       </header>
 
@@ -200,15 +247,32 @@ const triggerDownload = () => {
                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 Đang xác thực...
               </span>
-              <span v-else>Tạo vé</span>
+              <span v-else class="flex items-center justify-center gap-2">
+                <svg v-if="isTicketCached" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                {{ isTicketCached ? 'Tải vé PDF' : 'Tạo vé' }}
+              </span>
             </button>
           </form>
 
           <!-- Error Message -->
-          <div v-if="errorMessage" class="mt-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3">
+          <div v-if="errorMessage" class="mt-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3 animate-in fade-in">
             <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <p>{{ errorMessage }}</p>
           </div>
+
+          <!-- Success Message (Anti-spam) -->
+          <div v-if="successMessage" class="mt-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-start gap-3 animate-in fade-in duration-300">
+            <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p>{{ successMessage }}</p>
+          </div>
+
+          <!-- Contact Notice -->
+          <p class="mt-8 text-center text-[13px] text-[#BBA8D6]/70">
+            Nếu có vấn đề trong việc nhận vé, hãy liên hệ với
+            <a href="https://www.facebook.com/sividuc" target="_blank" rel="noopener noreferrer" class="text-[#00E5FF] hover:text-white font-medium underline underline-offset-2 transition-colors">
+              Sividuc
+            </a>
+          </p>
         </div>
 
         <!-- Ticket Preview Section -->
@@ -228,49 +292,12 @@ const triggerDownload = () => {
                 <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               </div>
               <h3 class="text-white text-lg font-semibold mb-2">Vé đã tạo thành công!</h3>
-              <p class="text-[#BBA8D6] text-sm">Hệ thống đang tự động tải vé về thiết bị của bạn. Bạn cũng có thể bấm nút Tải PDF bên dưới nếu quá trình tự động gặp lỗi.</p>
+              <p class="text-[#BBA8D6] text-sm">Hệ thống đang tự động tải vé về thiết bị của bạn. Bạn cũng có thể bấm nút Tải vé PDF bên form nếu quá trình tự động gặp lỗi.</p>
             </div>
-            
-            <button 
-              @click="triggerDownload"
-              class="self-start bg-white/10 text-white py-2 px-4 rounded-lg font-medium border-none shadow-inner-highlight hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-200 active:scale-[0.98] flex items-center gap-2 text-sm"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-              Tải PDF
-            </button>
           </div>
         </div>
 
       </main>
-
-      <!-- Sponsors Section -->
-      <div class="mt-24 w-full overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-        <p class="text-center text-xs font-medium tracking-widest text-[#BBA8D6] uppercase mb-8">Được đồng hành cùng</p>
-        <div class="flex w-max animate-marquee opacity-50 hover:opacity-100 transition-opacity duration-500">
-          <div class="flex gap-24 px-12 items-center">
-            <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/GDG.svg" alt="GDG Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <!-- <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" /> -->
-            <img src="./assets/n8n.svg" alt="n8n Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-          </div>
-          <div class="flex gap-24 px-12 items-center">
-            <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/GDG.svg" alt="GDG Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <!-- <img src="./assets/HerrenKnecht.svg" alt="HerrenKnecht Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" /> -->
-            <img src="./assets/n8n.svg" alt="n8n Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-            <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
-          </div>
-        </div>
-      </div>
 
       <!-- Footer -->
       <footer class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-center items-center gap-4">
