@@ -23,9 +23,15 @@ const route = useRoute()
       <header class="mb-8 md:mb-12 text-center flex flex-col items-center">
         <!-- Organizer Logos -->
         <div class="flex justify-center items-center">
-          <img src="./assets/vgi.svg" alt="VGI Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
-          <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-20 md:h-24 w-auto opacity-100 drop-shadow-[0_0_12px_rgba(255,255,255,0.15)] hover:scale-105 transition-all" />
-          <img src="./assets/vsaf.svg" alt="VSAF Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+          <a href="https://www.facebook.com/VGInetwork2019" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
+            <img src="./assets/vgi.svg" alt="VGI Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+          </a>
+          <a href="https://www.facebook.com/sividuc" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
+            <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-20 md:h-24 w-auto opacity-100 drop-shadow-[0_0_12px_rgba(255,255,255,0.15)]" />
+          </a>
+          <a href="https://www.facebook.com/vsa.frankfurt" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
+            <img src="./assets/vsaf.svg" alt="VSAF Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+          </a>
         </div>
 
         <div class="mb-3 flex justify-center items-center">
