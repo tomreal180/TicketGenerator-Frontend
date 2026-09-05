@@ -31,23 +31,38 @@ onMounted(() => {
     captchaToken.value = ''
   }
   
-  // Nạp thư viện API Google reCAPTCHA
-  const script = document.createElement('script')
-  script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
-  script.async = true
-  script.defer = true
-  
-  script.onload = () => {
-    // Khi script đã tải, render Widget
-    recaptchaWidgetId = (window as any).grecaptcha.render('recaptcha-widget', {
-      sitekey: RECAPTCHA_SITE_KEY,
-      callback: 'onCaptchaSuccess',
-      'expired-callback': 'onCaptchaExpired',
-      theme: 'dark' // Giao diện dark mode phù hợp với trang web
-    })
+  // Hàm thực thi việc Render widget (được gọi khi API tải xong hoặc nếu API đã có sẵn)
+  ;(window as any).onRecaptchaLoad = () => {
+    // Chỉ render nếu widget chưa được tạo trong thẻ div này
+    const widgetContainer = document.getElementById('recaptcha-widget')
+    if (widgetContainer && widgetContainer.innerHTML === '') {
+      try {
+        recaptchaWidgetId = (window as any).grecaptcha.render('recaptcha-widget', {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback: 'onCaptchaSuccess',
+          'expired-callback': 'onCaptchaExpired',
+          theme: 'dark' // Giao diện dark mode phù hợp với trang web
+        })
+      } catch (e) {
+        console.error("Lỗi khi render CAPTCHA", e)
+      }
+    }
   }
-  
-  document.head.appendChild(script)
+
+  // Kiểm tra xem đã tải script google recaptcha chưa
+  if (!(window as any).grecaptcha || !(window as any).grecaptcha.render) {
+    // Nếu chưa có, tiến hành chèn script vào Head
+    // Sử dụng ?onload=onRecaptchaLoad để Google tự động gọi lại hàm trên khi script đã sẵn sàng 100%
+    const script = document.createElement('script')
+    script.id = 'recaptcha-script'
+    script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit'
+    script.async = true
+    script.defer = true
+    document.head.appendChild(script)
+  } else {
+    // Nếu chuyển qua lại giữa các Tab (chuyển route), script đã tải rồi thì chỉ cần render lại
+    ;(window as any).onRecaptchaLoad()
+  }
 })
 
 onBeforeUnmount(() => {
