@@ -80,7 +80,7 @@ const route = useRoute()
             class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-center"
             :class="route.path === '/diemdanh' ? 'bg-[#482EC2] text-white shadow-md' : 'text-[#BBA8D6] hover:text-white hover:bg-white/5'"
           >
-            Đăng ký tham gia
+            Đăng ký xem thuyết trình SiviHack 2026
           </router-link>
         </div>
       </header>

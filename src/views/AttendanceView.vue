@@ -7,11 +7,11 @@ const isLoading = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 const hasRegistered = ref(false)
-const quantity = ref(1) // Số lượng điểm danh
+const userName = ref('') // Tên người điểm danh
 
 // Trỏ về Flask Backend
-const FLASK_API_URL = 'https://ticketgenerator-backend.onrender.com/api/attendance'
-// const FLASK_API_URL = 'http://127.0.0.1:5000/api/attendance' // Dùng khi test Local
+// const FLASK_API_URL = 'https://ticketgenerator-backend.onrender.com/api/attendance'
+const FLASK_API_URL = 'http://127.0.0.1:5000/api/attendance' // Dùng khi test Local
 
 // Test Key của Google (Hãy thay bằng Site Key thật)
 const RECAPTCHA_SITE_KEY = '6LfaFastAAAAACcdlya-pWl6IP9ZTwMylnAtTcqz'
@@ -62,8 +62,8 @@ const submitAttendance = async () => {
     return
   }
 
-  if (quantity.value < 1) {
-    errorMessage.value = 'Số lượng người tham gia phải lớn hơn hoặc bằng 1.'
+  if (!userName.value.trim()) {
+    errorMessage.value = 'Vui lòng nhập họ và tên của bạn.'
     return
   }
 
@@ -79,7 +79,7 @@ const submitAttendance = async () => {
       },
       body: JSON.stringify({
         token: captchaToken.value,
-        quantity: quantity.value
+        name: userName.value.trim()
       })
     })
 
@@ -134,16 +134,14 @@ const submitAttendance = async () => {
         
         <div class="flex flex-col items-center space-y-6 relative z-10">
           
-          <!-- Số lượng -->
+          <!-- Tên người tham gia -->
           <div class="w-full flex flex-col space-y-2">
-            <label class="text-white text-sm font-medium">Số lượng người tham gia</label>
+            <label class="text-white text-sm font-medium">Họ và tên của bạn</label>
             <input 
-              type="number" 
-              v-model="quantity" 
-              min="1" 
-              max="50"
+              type="text" 
+              v-model="userName" 
               class="w-full bg-[#2A164A]/60 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#6C47FF] focus:ring-1 focus:ring-[#6C47FF] transition-all"
-              placeholder="Nhập số lượng..."
+              placeholder="Nhập họ tên đầy đủ..."
             />
           </div>
 
