@@ -10,8 +10,8 @@ const hasRegistered = ref(false)
 const userName = ref('') // Tên người điểm danh
 
 // Trỏ về Flask Backend
-// const FLASK_API_URL = 'https://ticketgenerator-backend.onrender.com/api/attendance'
-const FLASK_API_URL = 'http://127.0.0.1:5000/api/attendance' // Dùng khi test Local
+const FLASK_API_URL = 'https://ticketgenerator-backend.onrender.com/api/attendance'
+// const FLASK_API_URL = 'http://127.0.0.1:5000/api/attendance' // Dùng khi test Local
 
 // Test Key của Google (Hãy thay bằng Site Key thật)
 const RECAPTCHA_SITE_KEY = '6LfaFastAAAAACcdlya-pWl6IP9ZTwMylnAtTcqz'
@@ -129,7 +129,7 @@ const submitAttendance = async () => {
 
       <div v-else>
         <p class="text-[#BBA8D6] text-sm mb-8 font-light leading-relaxed">
-          Buổi thuyết trình SiviHack 2026 có giới hạn số lượng chỗ ngồi cho buổi thuyết trình. Vui lòng nhấn xác nhận để đăng ký giữ chỗ.
+          Buổi thuyết trình SiviHack 2026 có giới hạn số lượng chỗ ngồi. Vui lòng nhấn xác nhận để đăng ký giữ chỗ.
         </p>
         
         <div class="flex flex-col items-center space-y-6 relative z-10">

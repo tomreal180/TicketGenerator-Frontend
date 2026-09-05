@@ -7,8 +7,8 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 const pdfUrl = ref<string | null>(null)
 const downloadedFilename = ref('ticket.pdf')
-// const API_URL = 'https://ticketgenerator-backend.onrender.com/api/generate-ticket'
-const API_URL = 'http://127.0.0.1:5000/api/generate-ticket' // Dùng khi test Local
+const API_URL = 'https://ticketgenerator-backend.onrender.com/api/generate-ticket'
+// const API_URL = 'http://127.0.0.1:5000/api/generate-ticket' // Dùng khi test Local
 
 const isEmailValid = computed(() => {
   if (!email.value) return null
