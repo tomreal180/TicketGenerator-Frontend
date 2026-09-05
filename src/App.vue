@@ -38,7 +38,7 @@ const route = useRoute()
           <div class="flex w-max animate-marquee opacity-60 hover:opacity-100 transition-opacity duration-500">
             <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center">
               <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-14 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 md:h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
               <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
               <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
               <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
@@ -48,7 +48,7 @@ const route = useRoute()
             </div>
             <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center" aria-hidden="true">
               <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-14 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 md:h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
               <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
               <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
               <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
