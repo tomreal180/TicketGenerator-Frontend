@@ -69,6 +69,7 @@ onBeforeUnmount(() => {
   // Dọn dẹp callback
   delete (window as any).onCaptchaSuccess
   delete (window as any).onCaptchaExpired
+  delete (window as any).onRecaptchaLoad
 })
 
 const submitAttendance = async () => {
@@ -160,9 +161,12 @@ const submitAttendance = async () => {
             />
           </div>
 
-          <!-- Widget Captcha -->
-          <div class="w-full flex justify-center mt-2">
-            <div id="recaptcha-widget" class="min-h-[78px]"></div>
+          <!-- Google reCAPTCHA v2 -->
+          <div class="w-full flex justify-center py-2 relative min-h-[78px]">
+            <div id="recaptcha-widget" class="transform scale-90 sm:scale-100 origin-center transition-all duration-300"></div>
+            <!-- Loading indicator for captcha -->
+            <div v-if="!isCaptchaSolved && !errorMessage" class="absolute inset-0 flex items-center justify-center -z-10 text-[#BBA8D6]/50 text-sm">
+            </div>
           </div>
 
           <button 
