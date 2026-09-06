@@ -128,7 +128,7 @@ const submitAttendance = async () => {
 <template>
   <main class="items-start flex-grow w-full transition-all duration-700 mt-4 flex justify-center">
     <!-- Form Section (Card) -->
-    <div class="w-full max-w-lg bg-[#1D0E36]/40 rounded-2xl border border-white/10 p-6 md:p-8 shadow-card backdrop-blur-xl relative overflow-hidden group">
+    <div class="w-full max-w-lg bg-[#1D0E36]/40 rounded-2xl border border-white/10 p-6 md:p-8 shadow-card backdrop-blur-xl relative overflow-hidden group transform-gpu">
       <!-- Inner Highlight -->
       <div class="absolute inset-0 rounded-2xl shadow-inner-highlight pointer-events-none"></div>
       

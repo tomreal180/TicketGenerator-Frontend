@@ -12,10 +12,10 @@ const route = useRoute()
     <div class="fixed inset-0 bg-noise z-0 mix-blend-overlay"></div>
     <div class="fixed inset-0 bg-grid-overlay z-0"></div>
     
-    <!-- Animated Glowing Blobs -->
-    <div class="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[#482EC2]/30 rounded-full blur-[120px] animate-float z-0 pointer-events-none"></div>
-    <div class="fixed top-[20%] left-[-10%] w-[600px] h-[600px] bg-[#FF3366]/10 rounded-full blur-[100px] animate-float-delayed z-0 pointer-events-none"></div>
-    <div class="fixed top-[40%] right-[-10%] w-[500px] h-[700px] bg-[#00E5FF]/10 rounded-full blur-[120px] animate-float z-0 pointer-events-none"></div>
+    <!-- Animated Glowing Blobs (iOS Safari Fix: Added transform-gpu) -->
+    <div class="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[#482EC2]/30 rounded-full blur-[120px] animate-float z-0 pointer-events-none transform-gpu"></div>
+    <div class="fixed top-[20%] left-[-10%] w-[600px] h-[600px] bg-[#FF3366]/10 rounded-full blur-[100px] animate-float-delayed z-0 pointer-events-none transform-gpu"></div>
+    <div class="fixed top-[40%] right-[-10%] w-[500px] h-[700px] bg-[#00E5FF]/10 rounded-full blur-[120px] animate-float z-0 pointer-events-none transform-gpu"></div>
 
     <div class="relative z-10 flex-grow flex flex-col max-w-6xl mx-auto w-full px-6 md:px-12 py-8 md:py-12">
       
