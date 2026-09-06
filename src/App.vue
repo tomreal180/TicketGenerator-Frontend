@@ -27,7 +27,7 @@ const route = useRoute()
             <img src="./assets/vgi.svg" alt="VGI Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
           </a>
           <a href="https://www.facebook.com/sividuc" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
-            <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-20 md:h-24 w-auto opacity-100 drop-shadow-[0_0_12px_rgba(255,255,255,0.15)]" />
+            <img src="./assets/sividuc.svg" alt="Sividuc Logo" class="h-20 md:h-24 w-auto opacity-100" />
           </a>
           <a href="https://www.facebook.com/vsa.frankfurt" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
             <img src="./assets/vsaf.svg" alt="VSAF Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
@@ -35,32 +35,33 @@ const route = useRoute()
         </div>
 
         <div class="mb-3 flex justify-center items-center">
-          <img src="./assets/LOGO.svg" alt="SiviCamp 2026 Logo" class="h-28 md:h-32 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" />
+          <img src="./assets/LOGO.svg" alt="SiviCamp 2026 Logo" class="h-28 md:h-32 w-auto" />
         </div>
         
         <!-- Sponsors Section -->
-        <div class="mb-16 w-full max-w-4xl overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
+        <div class="mb-16 w-full max-w-4xl overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] md:[-webkit-mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
           <p class="text-center text-xs font-medium tracking-widest text-[#BBA8D6]/60 uppercase mb-4">Được đồng hành cùng</p>
-          <div class="flex w-max animate-marquee opacity-60 hover:opacity-100 transition-opacity duration-500">
-            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center">
-              <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 md:h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/GDG.svg" alt="GDG Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/n8n.svg" alt="n8n Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+          <!-- Added will-change-transform and transform-gpu -->
+          <div class="flex w-max animate-marquee opacity-60 hover:opacity-100 transition-opacity duration-500 transform-gpu will-change-transform">
+            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center transform-gpu">
+              <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 md:h-16 w-auto" />
+              <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto" />
+              <img src="./assets/GDG.svg" alt="GDG Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/n8n.svg" alt="n8n Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto" />
             </div>
-            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center" aria-hidden="true">
-              <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 md:h-16 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/GDG.svg" alt="GDG Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/n8n.svg" alt="n8n Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
-              <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto drop-shadow-[0_0_15px_rgba(0,229,255,0.2)]" />
+            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center transform-gpu" aria-hidden="true">
+              <img src="./assets/Code4You.svg" alt="Code4You Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/VietinBank.svg" alt="VietinBank Logo" class="h-16 md:h-16 w-auto" />
+              <img src="./assets/NVIDIA.svg" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/ArticsAI.svg" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/Datanomiq.svg" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto" />
+              <img src="./assets/GDG.svg" alt="GDG Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/n8n.svg" alt="n8n Logo" class="h-10 md:h-12 w-auto" />
+              <img src="./assets/VietnamAirlines.svg" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto" />
             </div>
           </div>
         </div>
