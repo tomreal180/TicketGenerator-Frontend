@@ -133,7 +133,7 @@ const submitAttendance = async () => {
       <!-- Inner Highlight -->
       <div class="absolute inset-0 rounded-2xl shadow-inner-highlight pointer-events-none"></div>
       
-      <h2 class="text-2xl font-semibold tracking-tight mb-4 text-white">Đăng ký xem thuyết trình SiviHack 2026</h2>
+      <h2 class="text-2xl font-semibold tracking-tight mb-4 text-white">Đăng ký xem chung kết SiviHack 2026</h2>
       
       <div v-if="hasRegistered" class="relative z-10 flex flex-col items-center justify-center text-center py-8">
         <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
