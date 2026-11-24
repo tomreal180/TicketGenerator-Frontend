@@ -1,143 +1,267 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue';
+import { 
+  QrCode, 
+  UserCheck, 
+  Users, 
+  Sparkles
+} from 'lucide-vue-next';
 
-const route = useRoute()
-const isMounted = ref(false)
+import Header from './components/Header.vue';
+import ScannerTab from './components/ScannerTab.vue';
+import ManualCheckinTab from './components/ManualCheckinTab.vue';
+import CheckinResultCard from './components/CheckinResultCard.vue';
+import AttendeesDashboard from './components/AttendeesDashboard.vue';
+import SettingsModal from './components/SettingsModal.vue';
+
+import { Attendee, CheckinResult } from './types/attendee';
+import { gasService } from './services/gasService';
+
+// Active Tab: 'scanner' | 'manual' | 'dashboard'
+const activeTab = ref<'scanner' | 'manual' | 'dashboard'>('scanner');
+const scannerTabRef = ref<InstanceType<typeof ScannerTab> | null>(null);
+
+// App States
+const attendees = ref<Attendee[]>([]);
+const isProcessing = ref(false);
+const isLoadingList = ref(false);
+const isSettingsOpen = ref(false);
+
+const gasUrl = ref(gasService.getGasUrl());
+const verifierName = ref(gasService.getVerifierName());
+
+// Check-in Result State (Displayed directly below scanner / manual form)
+const checkinResult = ref<CheckinResult>({
+  status: 'idle',
+  message: '',
+});
+
+// Load attendees list
+const loadAttendees = async (forceRefresh = false) => {
+  isLoadingList.value = true;
+  try {
+    const list = await gasService.fetchAttendees(forceRefresh);
+    attendees.value = list;
+  } catch (err: any) {
+    console.error('Lỗi khi tải danh sách người tham gia:', err);
+  } finally {
+    isLoadingList.value = false;
+  }
+};
+
+// Handle QR Scan
+const handleScan = async (qrData: string) => {
+  if (isProcessing.value) return;
+  isProcessing.value = true;
+  checkinResult.value = {
+    status: 'loading',
+    message: 'Đang kiểm tra mã QR với Google Apps Script...',
+  };
+
+  try {
+    const res = await gasService.checkInByCode(qrData);
+    checkinResult.value = res;
+    // Cập nhật lại danh sách nếu check-in thành công
+    if (res.status === 'success') {
+      loadAttendees(true);
+    }
+  } catch (err: any) {
+    checkinResult.value = {
+      status: 'invalid',
+      message: 'Lỗi kiểm tra vé: ' + (err.message || 'Không xác định'),
+    };
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+// Handle Manual Check-in Submit (Email + DOB)
+const handleManualSubmit = async (data: { email: string; dob: string }) => {
+  if (isProcessing.value) return;
+  isProcessing.value = true;
+  checkinResult.value = {
+    status: 'loading',
+    message: 'Đang đối chiếu Email và Ngày sinh với Google Apps Script...',
+  };
+
+  try {
+    const res = await gasService.checkInByDetails(data.email, data.dob);
+    checkinResult.value = res;
+    // Cập nhật lại danh sách nếu check-in thành công
+    if (res.status === 'success') {
+      loadAttendees(true);
+    }
+  } catch (err: any) {
+    checkinResult.value = {
+      status: 'invalid',
+      message: 'Lỗi kiểm tra vé: ' + (err.message || 'Không xác định'),
+    };
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+// Theo dõi khi chuyển tab để gọi hàm tương ứng và dọn trạng thái
+watch(activeTab, (newTab) => {
+  // Khi chuyển sang Tab Bảng Soát Vé: Tự động gọi API getAttendees để lấy danh sách mới nhất từ Google Sheet
+  if (newTab === 'dashboard') {
+    loadAttendees(true);
+  }
+  // Khi chuyển tab khác, nếu kết quả trước đó đã xong thì xóa để tab mới sạch sẽ
+  if (checkinResult.value.status !== 'loading') {
+    checkinResult.value = {
+      status: 'idle',
+      message: '',
+    };
+  }
+});
+
+// Clear Result card và kích hoạt lại camera nếu đang ở tab scanner
+const clearResult = () => {
+  checkinResult.value = {
+    status: 'idle',
+    message: '',
+  };
+  if (activeTab.value === 'scanner') {
+    scannerTabRef.value?.startScanning();
+  }
+};
+
+// Save Settings
+const handleSaveSettings = (config: { verifierName: string }) => {
+  gasService.saveSettings(config.verifierName);
+  verifierName.value = gasService.getVerifierName();
+};
+
+// Xóa sạch bộ nhớ tạm (Cache) trên thiết bị
+const handleClearCache = async () => {
+  gasService.clearLocalCache();
+  attendees.value = [];
+  checkinResult.value = {
+    status: 'idle',
+    message: '',
+  };
+  await loadAttendees(true);
+  alert('Đã xóa sạch bộ nhớ tạm (cache) trên thiết bị thành công!');
+};
 
 onMounted(() => {
-  setTimeout(() => {
-    isMounted.value = true
-  }, 150)
-})
+  loadAttendees(false);
+});
 </script>
 
 <template>
-  <div class="min-h-screen relative bg-background-base text-[#F4F0FA] flex flex-col font-sans">
-    
-    <!-- Ambient Background Layers -->
-    <div class="fixed inset-0 bg-radial-fade z-0"></div>
-    <div class="fixed inset-0 bg-noise z-0 mix-blend-overlay"></div>
-    <div class="fixed inset-0 bg-grid-overlay z-0"></div>
-    
-    <!-- Animated Glowing Blobs (iOS Safari Fix: Added transform-gpu) -->
-    <div class="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[#482EC2]/30 rounded-full blur-[120px] animate-float z-0 pointer-events-none transform-gpu"></div>
-    <div class="fixed top-[20%] left-[-10%] w-[600px] h-[600px] bg-[#FF3366]/10 rounded-full blur-[100px] animate-float-delayed z-0 pointer-events-none transform-gpu"></div>
-    <div class="fixed top-[40%] right-[-10%] w-[500px] h-[700px] bg-[#00E5FF]/10 rounded-full blur-[120px] animate-float z-0 pointer-events-none transform-gpu"></div>
+  <div class="min-h-screen bg-stone-100 flex flex-col font-sans pb-16">
+    <!-- Top Header -->
+    <Header
+      :gas-url="gasUrl"
+      :verifier-name="verifierName"
+      @open-settings="isSettingsOpen = true"
+    />
 
-    <div class="relative z-10 flex-grow flex flex-col max-w-6xl mx-auto w-full px-6 md:px-12 py-8 md:py-12">
-      
-      <!-- Header -->
-      <header class="mb-8 md:mb-12 text-center flex flex-col items-center">
-        <!-- Organizer Logos -->
-        <div class="flex justify-center items-center">
-          <a href="https://www.facebook.com/VGInetwork2019" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
-            <img src="./assets/vgi.png" alt="VGI Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
-          </a>
-          <a href="https://www.facebook.com/sividuc" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
-            <img src="./assets/sividuc.png" alt="Sividuc Logo" class="h-20 md:h-24 w-auto opacity-100" />
-          </a>
-          <a href="https://www.facebook.com/vsa.frankfurt" target="_blank" rel="noopener noreferrer" class="hover:scale-105 transition-all">
-            <img src="./assets/vsaf.png" alt="VSAF Logo" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
-          </a>
-        </div>
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-6 space-y-6">
+      <!-- Navigation Tabs -->
+      <div class="bg-white rounded-2xl p-1.5 shadow-md border border-stone-200 flex items-center justify-between">
+        <div class="grid grid-cols-3 gap-1.5 w-full text-xs sm:text-sm font-bold">
+          <!-- Tab 1: Camera Scanner -->
+          <button
+            @click="activeTab = 'scanner'"
+            :class="activeTab === 'scanner' 
+              ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md' 
+              : 'text-stone-600 hover:text-red-700 hover:bg-stone-50'"
+            class="py-3 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2 active:scale-98"
+          >
+            <QrCode class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span class="truncate">Quét Camera</span>
+          </button>
 
-        <div class="mb-3 flex justify-center items-center">
-          <img src="./assets/LOGO.png" alt="SiviCamp 2026 Logo" class="h-28 md:h-32 w-auto" />
+          <!-- Tab 2: Manual Check-in (Email + DOB) -->
+          <button
+            @click="activeTab = 'manual'"
+            :class="activeTab === 'manual' 
+              ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md' 
+              : 'text-stone-600 hover:text-red-700 hover:bg-stone-50'"
+            class="py-3 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2 active:scale-98"
+          >
+            <UserCheck class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span class="truncate">Soát Thủ Công</span>
+          </button>
+
+          <!-- Tab 3: Attendees List & Dashboard -->
+          <button
+            @click="activeTab = 'dashboard'"
+            :class="activeTab === 'dashboard' 
+              ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md' 
+              : 'text-stone-600 hover:text-red-700 hover:bg-stone-50'"
+            class="py-3 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2 active:scale-98"
+          >
+            <Users class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span class="truncate">Bảng Soát Vé</span>
+          </button>
         </div>
-        
-        <!-- Sponsors Section -->
-        <div class="mb-16 w-full max-w-4xl overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] md:[-webkit-mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-          <p class="text-center text-xs font-medium tracking-widest text-[#BBA8D6]/60 uppercase mb-4">Được đồng hành cùng</p>
-          <div :class="['flex w-max opacity-60 hover:opacity-100 transition-opacity duration-500 transform-gpu will-change-transform', isMounted ? 'animate-marquee' : '']">
-            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center transform-gpu">
-              <img src="./assets/Code4You.png" alt="Code4You Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/VietinBank.png" alt="VietinBank Logo" class="h-16 md:h-16 w-auto max-w-none" />
-              <img src="./assets/NVIDIA.png" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/ArticsAI.png" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/Datanomiq.png" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto max-w-none" />
-              <img src="./assets/GDG.png" alt="GDG Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/n8n.png" alt="n8n Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/VietnamAirlines.png" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto max-w-none" />
-            </div>
-            <div class="flex gap-12 md:gap-16 px-6 md:px-8 items-center transform-gpu" aria-hidden="true">
-              <img src="./assets/Code4You.png" alt="Code4You Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/VietinBank.png" alt="VietinBank Logo" class="h-16 md:h-16 w-auto max-w-none" />
-              <img src="./assets/NVIDIA.png" alt="NVIDIA Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/ArticsAI.png" alt="ArticsAI Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/Datanomiq.png" alt="Datanomiq Logo" class="h-14 md:h-14 w-auto max-w-none" />
-              <img src="./assets/GDG.png" alt="GDG Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/n8n.png" alt="n8n Logo" class="h-10 md:h-12 w-auto max-w-none" />
-              <img src="./assets/VietnamAirlines.png" alt="VietnamAirlines Logo" class="h-10 md:h-12 w-auto max-w-none" />
-            </div>
+      </div>
+
+      <!-- VIEW 1: SCANNER TAB -->
+      <div v-show="activeTab === 'scanner'" class="space-y-6">
+        <ScannerTab
+          ref="scannerTabRef"
+          :is-processing="isProcessing"
+          :is-active-tab="activeTab === 'scanner'"
+          @scan="handleScan"
+        />
+
+        <!-- RESULT AREA (Always below camera/form as requested) -->
+        <div class="pt-2">
+          <div class="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-stone-500">
+            <Sparkles class="w-4 h-4 text-amber-500" />
+            <span>Kết quả xác thực từ Google Apps Script</span>
           </div>
+          <CheckinResultCard
+            :result="checkinResult"
+            @clear="clearResult"
+          />
         </div>
+      </div>
 
-        <h1 class="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-tight mb-4 bg-gradient-to-b from-white via-[#E2D9F3] to-[#8A78A8] bg-clip-text text-transparent">
-          SiviCamp 2026
-        </h1>
-        <p class="text-[#BBA8D6] text-base md:text-lg max-w-2xl font-light mb-8">
-          Vui lòng chọn chức năng bên dưới.
-        </p>
+      <!-- VIEW 2: MANUAL CHECK-IN TAB (Email + DOB) -->
+      <div v-show="activeTab === 'manual'" class="space-y-6">
+        <ManualCheckinTab
+          :is-processing="isProcessing"
+          @submit="handleManualSubmit"
+        />
 
-        <!-- Navigation Switcher -->
-        <div class="bg-[#1D0E36]/60 backdrop-blur-md p-1.5 rounded-xl border border-white/10 flex items-center gap-1 w-full max-w-md mx-auto shadow-inner">
-          <router-link 
-            to="/nhanve"
-            class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-center"
-            :class="route.path === '/nhanve' ? 'bg-[#482EC2] text-white shadow-md' : 'text-[#BBA8D6] hover:text-white hover:bg-white/5'"
-          >
-            Lấy vé điện tử
-          </router-link>
-          <router-link 
-            to="/diemdanh"
-            class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-center"
-            :class="route.path === '/diemdanh' ? 'bg-[#482EC2] text-white shadow-md' : 'text-[#BBA8D6] hover:text-white hover:bg-white/5'"
-          >
-            Đăng ký xem SiviHack 2026
-          </router-link>
+        <!-- RESULT AREA (Always below camera/form as requested) -->
+        <div class="pt-2">
+          <div class="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-stone-500">
+            <Sparkles class="w-4 h-4 text-amber-500" />
+            <span>Kết quả xác thực từ Google Apps Script</span>
+          </div>
+          <CheckinResultCard
+            :result="checkinResult"
+            @clear="clearResult"
+          />
         </div>
-      </header>
+      </div>
 
-      <!-- Router View for Page Content -->
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <!-- VIEW 3: ATTENDEES LIST & DASHBOARD -->
+      <div v-show="activeTab === 'dashboard'">
+        <AttendeesDashboard
+          :attendees="attendees"
+          :is-loading="isLoadingList"
+          @refresh="loadAttendees(true)"
+        />
+      </div>
+    </main>
 
-      <!-- Footer -->
-      <footer class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-center items-center gap-4">
-        <p class="text-[#BBA8D6] text-xs tracking-wider">
-          <span class="text-white font-medium">SiviCamp</span> © 2026
-        </p>
-      </footer>
-    </div>
+    <!-- Settings Modal -->
+    <SettingsModal
+      :is-open="isSettingsOpen"
+      :initial-gas-url="gasUrl"
+      :initial-verifier-name="verifierName"
+      @close="isSettingsOpen = false"
+      @save="handleSaveSettings"
+      @clear-cache="handleClearCache"
+    />
   </div>
 </template>
-
-<style>
-@keyframes shimmer {
-  100% { transform: translateX(100%); }
-}
-
-@keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee 20s linear infinite;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
-</style>

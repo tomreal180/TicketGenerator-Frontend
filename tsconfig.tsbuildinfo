@@ -1,0 +1,1 @@
+{"root":["./src/main.ts","./src/services/gasservice.ts","./src/types/attendee.ts","./src/app.vue","./src/components/attendeesdashboard.vue","./src/components/checkinresultcard.vue","./src/components/header.vue","./src/components/manualcheckintab.vue","./src/components/scannertab.vue","./src/components/settingsmodal.vue"],"version":"5.9.3"}

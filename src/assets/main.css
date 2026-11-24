@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900 font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom Scanline Animation for Scanner Overlay */
+@keyframes scanline {
+  0% {
+    top: 5%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 90%;
+    opacity: 1;
+  }
+  100% {
+    top: 5%;
+    opacity: 0.8;
+  }
+}
+
+.animate-scan {
+  animation: scanline 2.5s ease-in-out infinite;
+}
+
+/* Smooth custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Gold shimmer effect */
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.1) 0%,
+    rgba(255, 215, 0, 0.4) 50%,
+    rgba(255, 215, 0, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
