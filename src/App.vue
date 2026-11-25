@@ -75,30 +75,10 @@ const handleScan = async (qrData: string) => {
   }
 };
 
-// Handle Manual Check-in Submit (Email + DOB)
-const handleManualSubmit = async (data: { email: string; dob: string }) => {
-  if (isProcessing.value) return;
-  isProcessing.value = true;
-  checkinResult.value = {
-    status: 'loading',
-    message: 'Đang đối chiếu Email và Ngày sinh với Google Apps Script...',
-  };
-
-  try {
-    const res = await gasService.checkInByDetails(data.email, data.dob);
-    checkinResult.value = res;
-    // Cập nhật lại danh sách nếu check-in thành công
-    if (res.status === 'success') {
-      loadAttendees(true);
-    }
-  } catch (err: any) {
-    checkinResult.value = {
-      status: 'invalid',
-      message: 'Lỗi kiểm tra vé: ' + (err.message || 'Không xác định'),
-    };
-  } finally {
-    isProcessing.value = false;
-  }
+// Handle Manual Check-in Success
+const handleManualCheckedIn = (_attendee: Attendee) => {
+  // Cập nhật lại danh sách Dashboard
+  loadAttendees(true);
 };
 
 // Theo dõi khi chuyển tab để gọi hàm tương ứng và dọn trạng thái
@@ -227,21 +207,8 @@ onMounted(() => {
       <!-- VIEW 2: MANUAL CHECK-IN TAB (Email + DOB) -->
       <div v-show="activeTab === 'manual'" class="space-y-6">
         <ManualCheckinTab
-          :is-processing="isProcessing"
-          @submit="handleManualSubmit"
+          @checked-in="handleManualCheckedIn"
         />
-
-        <!-- RESULT AREA (Always below camera/form as requested) -->
-        <div class="pt-2">
-          <div class="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-stone-500">
-            <Sparkles class="w-4 h-4 text-amber-500" />
-            <span>Kết quả xác thực từ Google Apps Script</span>
-          </div>
-          <CheckinResultCard
-            :result="checkinResult"
-            @clear="clearResult"
-          />
-        </div>
       </div>
 
       <!-- VIEW 3: ATTENDEES LIST & DASHBOARD -->

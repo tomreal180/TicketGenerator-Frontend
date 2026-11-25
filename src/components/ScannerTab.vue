@@ -87,7 +87,6 @@ const startScanning = async () => {
 
     const config = {
       fps: 12,
-      qrbox: { width: 240, height: 240 },
       aspectRatio: 1.0,
     };
 
@@ -342,3 +341,29 @@ defineExpose({
     <div id="temp-qr-reader" class="hidden"></div>
   </div>
 </template>
+
+<style scoped>
+/* Ẩn hoàn toàn ô trắng và vùng che mặc định do thư viện html5-qrcode tự chèn vào DOM */
+:deep(#qr-shaded-region),
+:deep(#qr-shaded-region div),
+:deep(#qr-reader-video__scan_region),
+:deep(#qr-reader-video__scan_region div) {
+  display: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+:deep(#qr-reader-video) {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+}
+
+:deep(#qr-reader-video video) {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+</style>

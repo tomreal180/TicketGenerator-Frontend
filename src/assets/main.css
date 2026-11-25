@@ -64,3 +64,14 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+/* Ẩn hoàn toàn ô trắng và viền che tự sinh của thư viện html5-qrcode */
+#qr-shaded-region,
+#qr-shaded-region div,
+#qr-reader-video__scan_region,
+#qr-reader-video__scan_region div {
+  display: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}

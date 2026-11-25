@@ -1,4 +1,4 @@
-import { Attendee, CheckinResult, GasApiResponse } from '../types/attendee';
+import { Attendee, CheckinResult, GasApiResponse, SearchTicketsResponse } from '../types/attendee';
 
 /**
  * ==============================================================================
@@ -15,7 +15,7 @@ import { Attendee, CheckinResult, GasApiResponse } from '../types/attendee';
  * 5. Ai có quyền truy cập: Bất kỳ ai (Who has access: Anyone)
  * 6. Copy URL (có dạng https://script.google.com/macros/s/.../exec) và dán vào đây:
  */
-export const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwgrczEWhLytzgQKmqL9jHnReMU4LyrBodU2GOKzWrbC4zAIRz1HEsnsd_2Lm_rGeXi/exec';
+export const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyMxpCgQqxj36K8B5B214RokWOCmHNmjFPAKArlY6Q01ewpw1hl6tLTZ6OZfxfcEdCo/exec';
 
 const STORAGE_KEY_ATTENDEES = 'tet_karlsruhe_attendees_cache';
 const STORAGE_KEY_VERIFIER = 'tet_karlsruhe_verifier_name';
@@ -110,7 +110,14 @@ export class GasService {
    * Dùng 'Content-Type': 'text/plain;charset=utf-8' để tránh bị trình duyệt gửi CORS OPTIONS preflight
    */
   private async postToGas<T>(payload: Record<string, any>): Promise<GasApiResponse<T>> {
-    const res = await fetch(this.gasUrl, {
+    // Gửi action trên cả URL query string lẫn body để đảm bảo Apps Script luôn đọc được action
+    const url = payload.action
+      ? (this.gasUrl.includes('?') 
+          ? `${this.gasUrl}&action=${encodeURIComponent(payload.action)}` 
+          : `${this.gasUrl}?action=${encodeURIComponent(payload.action)}`)
+      : this.gasUrl;
+
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
@@ -229,9 +236,142 @@ export class GasService {
   }
 
   /**
+   * Tìm kiếm tất cả các vé của một người theo Email và Ngày sinh
+   * (Phục vụ hiển thị đầy đủ danh sách vé nếu mua nhiều lần)
+   */
+  async searchTicketsByDetails(email: string, dob: string): Promise<SearchTicketsResponse> {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanDob = this.normalizeDate(dob);
+
+    if (!cleanEmail || !cleanDob) {
+      return {
+        success: false,
+        tickets: [],
+        error: 'Vui lòng nhập đầy đủ Email và Ngày sinh.',
+      };
+    }
+
+    try {
+      const json = await this.postToGas<Attendee[]>({
+        action: 'getTicketsByDetails',
+        email: cleanEmail,
+        dob: cleanDob,
+      });
+
+      if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+        if (json.error?.includes('action') || json.error?.includes('Chưa chỉ định action')) {
+          return {
+            success: false,
+            tickets: [],
+            error: 'Máy chủ Google Apps Script đang chạy bản triển khai cũ (chưa cập nhật action mới). Hãy vào Apps Script > Triển khai > Quản lý bản triển khai > Sửa thành "Phiên bản mới (New version)"!',
+          };
+        }
+        return {
+          success: false,
+          tickets: [],
+          error: json.error || 'Không tìm thấy vé nào với Email và Ngày sinh đã nhập.',
+        };
+      }
+
+      const tickets: Attendee[] = json.data.map((t) => ({
+        ...t,
+        dob: this.normalizeDate(t.dob),
+      }));
+
+      // Cập nhật vào cache
+      tickets.forEach((ticket) => {
+        const idx = this.cachedAttendees.findIndex((a) => a.id === ticket.id || a.ticketCode === ticket.ticketCode);
+        if (idx !== -1) {
+          this.cachedAttendees[idx] = ticket;
+        } else {
+          this.cachedAttendees.unshift(ticket);
+        }
+      });
+      this.saveLocalCache();
+
+      return {
+        success: true,
+        tickets,
+        message: json.message || `Tìm thấy ${tickets.length} vé của khách hàng này.`,
+      };
+    } catch (err: any) {
+      console.error('GAS searchTicketsByDetails error:', err);
+      return {
+        success: false,
+        tickets: [],
+        error: 'Lỗi kết nối tới máy chủ Google Apps Script: ' + (err.message || 'Mất mạng'),
+      };
+    }
+  }
+
+  /**
+   * Check in attendee by specific Ticket ID
+   */
+  async checkInById(ticketId: string): Promise<CheckinResult> {
+    const cleanId = ticketId.trim();
+    if (!cleanId) {
+      return {
+        status: 'invalid',
+        message: 'Thiếu mã vé cần check-in.',
+      };
+    }
+
+    try {
+      const json = await this.postToGas<{ attendee: Attendee; alreadyCheckedIn: boolean }>({
+        action: 'checkInById',
+        ticketId: cleanId,
+        verifier: this.verifierName,
+      });
+
+      if (!json.success || !json.data?.attendee) {
+        return {
+          status: 'not_found',
+          message: json.message || 'Không thể check-in cho mã vé này!',
+          error: json.error,
+        };
+      }
+
+      const attendee = json.data.attendee;
+      attendee.dob = this.normalizeDate(attendee.dob);
+
+      // Cập nhật cache
+      const index = this.cachedAttendees.findIndex((a) => a.ticketCode === attendee.ticketCode || a.id === attendee.id);
+      if (index !== -1) {
+        this.cachedAttendees[index] = attendee;
+      } else {
+        this.cachedAttendees.unshift(attendee);
+      }
+      this.saveLocalCache();
+
+      if (json.data?.alreadyCheckedIn) {
+        return {
+          status: 'already_checked_in',
+          message: `Vé này ĐÃ CHECK-IN trước đó lúc ${attendee.checkInTime || 'trước'}!`,
+          attendee,
+          checkedAt: attendee.checkInTime,
+        };
+      }
+
+      return {
+        status: 'success',
+        message: `Soát vé thành công cho mã vé ${attendee.ticketCode}!`,
+        attendee,
+        checkedAt: attendee.checkInTime,
+      };
+    } catch (err: any) {
+      console.error('GAS checkInById error:', err);
+      return {
+        status: 'invalid',
+        message: 'Lỗi kết nối tới Google Apps Script: ' + err.message,
+        error: err.message,
+      };
+    }
+  }
+
+  /**
    * Check in attendee by Email & Date of Birth via HTTP POST (Manual Check-in)
    */
-  async checkInByDetails(email: string, dob: string): Promise<CheckinResult> {
+  async checkInByDetails(email: string, dob: string): Promise<CheckinResult & { tickets?: Attendee[]; multipleTickets?: boolean }> {
     const cleanEmail = email.trim().toLowerCase();
     const cleanDob = this.normalizeDate(dob);
 
@@ -243,14 +383,14 @@ export class GasService {
     }
 
     try {
-      const json = await this.postToGas<{ attendee: Attendee; alreadyCheckedIn: boolean }>({
+      const json = await this.postToGas<any>({
         action: 'checkInByDetails',
         email: cleanEmail,
         dob: cleanDob,
         verifier: this.verifierName,
       });
 
-      if (!json.success || !json.data?.attendee) {
+      if (!json.success) {
         return {
           status: 'not_found',
           message: json.message || 'Không tìm thấy người tham gia với Email và Ngày sinh đã nhập!',
@@ -258,7 +398,27 @@ export class GasService {
         };
       }
 
-      const attendee = json.data.attendee;
+      // Trường hợp có nhiều vé
+      if (json.multipleTickets && Array.isArray(json.data)) {
+        const tickets: Attendee[] = json.data.map((t: Attendee) => ({
+          ...t,
+          dob: this.normalizeDate(t.dob),
+        }));
+        return {
+          status: 'idle',
+          message: json.message || `Tìm thấy ${tickets.length} vé. Vui lòng chọn vé cần check-in.`,
+          multipleTickets: true,
+          tickets,
+        };
+      }
+
+      const attendee = json.data?.attendee;
+      if (!attendee) {
+        return {
+          status: 'not_found',
+          message: 'Không tìm thấy thông tin vé.',
+        };
+      }
       attendee.dob = this.normalizeDate(attendee.dob);
       const index = this.cachedAttendees.findIndex((a) => a.id === attendee.id || a.email.toLowerCase() === cleanEmail);
       if (index !== -1) {
